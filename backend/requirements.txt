@@ -1,11 +1,13 @@
-fastapi
-uvicorn[standard]
-pydantic>=2
-pydantic-settings
-python-multipart
-google-generativeai
-python-dotenv
-pillow
-# Dev / testing
-pytest
-httpx
+# Production dependencies
+fastapi>=0.115.0,<1.0
+uvicorn[standard]>=0.34.0,<1.0
+gunicorn>=23.0.0,<24.0
+pydantic>=2.10.0,<3.0
+pydantic-settings>=2.7.0,<3.0
+python-multipart>=0.0.20,<1.0
+google-generativeai>=0.8.0,<1.0
+python-dotenv>=1.0.0,<2.0
+pillow>=11.0.0,<12.0
+
+# Dev / testing — not installed in production
+# Install with: pip install -r requirements-dev.txt
