@@ -1,15 +1,16 @@
-"""
-config.py – Application settings loaded from environment / .env file.
+﻿"""
+config.py - Application settings loaded from environment / .env file.
 
 Uses pydantic-settings so every value can be overridden via environment
 variables or a .env file placed in the backend/ directory.
 """
 
 
+import json
 from functools import lru_cache
 from typing import List
 
-from pydantic import Field, field_validator
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,7 +24,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # ── Gemini ──────────────────────────────────────────────────────────────
+    # -- Gemini --------------------------------------------------------------
     gemini_api_key: str = Field(
         default="",
         description="Google Gemini API key (required in production).",
@@ -33,7 +34,7 @@ class Settings(BaseSettings):
         description="Gemini model identifier. Override via GEMINI_MODEL env var.",
     )
 
-    # ── Upload limits ────────────────────────────────────────────────────────
+    # -- Upload limits -------------------------------------------------------
     max_upload_mb: int = Field(
         default=10,
         description="Maximum file upload size in megabytes.",
@@ -41,25 +42,38 @@ class Settings(BaseSettings):
         le=100,
     )
 
-    # ── CORS ─────────────────────────────────────────────────────────────────
-    allowed_origins: List[str] = Field(
-        default=["http://localhost:5173"],
+    # -- CORS ----------------------------------------------------------------
+    # Stored as a raw string to avoid pydantic-settings v2 attempting JSON
+    # decoding on List[str] fields before any validator has a chance to run.
+    # Accepts three formats via the ALLOWED_ORIGINS env var:
+    #   1. JSON array  : ["https://a.vercel.app","https://b.vercel.app"]
+    #   2. CSV string  : https://a.vercel.app,https://b.vercel.app
+    #   3. Single URL  : https://a.vercel.app
+    allowed_origins_raw: str = Field(
+        default="http://localhost:5173",
+        alias="allowed_origins",
         description=(
-            "List of allowed CORS origins. "
-            "Supply as a JSON array or comma-separated string via ALLOWED_ORIGINS."
+            "Allowed CORS origins. Supply as a JSON array, comma-separated "
+            "string, or single URL via the ALLOWED_ORIGINS env var."
         ),
     )
 
-    @field_validator("allowed_origins", mode="before")
-    @classmethod
-    def _parse_origins(cls, v: object) -> List[str]:
-        """Accept both a JSON list and a comma-separated string."""
-        if isinstance(v, str):
-            # Handle comma-separated: "http://localhost:5173,http://localhost:3000"
-            return [o.strip() for o in v.split(",") if o.strip()]
-        return v  # type: ignore[return-value]
+    @property
+    def allowed_origins(self) -> List[str]:
+        """Parse allowed_origins_raw into a list of origin strings."""
+        raw = self.allowed_origins_raw.strip()
+        # Try JSON array first: ["https://...", "https://..."]
+        if raw.startswith("["):
+            try:
+                parsed = json.loads(raw)
+                if isinstance(parsed, list):
+                    return [str(o).strip() for o in parsed if str(o).strip()]
+            except json.JSONDecodeError:
+                pass
+        # Fall back to comma-separated or single value
+        return [o.strip() for o in raw.split(",") if o.strip()]
 
-    # ── Derived helpers ───────────────────────────────────────────────────────
+    # -- Derived helpers -----------------------------------------------------
     @property
     def max_upload_bytes(self) -> int:
         return self.max_upload_mb * 1024 * 1024
