@@ -1,0 +1,188 @@
+/*
+ * index.css — Health Copilot global styles
+ *
+ * Tailwind CSS v4 uses @import "tailwindcss" instead of @tailwind directives.
+ * Custom design tokens are defined with CSS custom properties inside @theme.
+ */
+
+@import "tailwindcss";
+
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Font family — Inter first, then Indic scripts for multilingual support */
+  --font-family-sans:
+    "Inter", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans Tamil",
+    ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Primary palette — teal */
+  --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-800: #115e59;
+  --color-primary-900: #134e4a;
+
+  /* Severity semantic tokens */
+  --color-severity-normal-bg: #ecfdf5;
+  /* emerald-50  */
+  --color-severity-normal-text: #065f46;
+  /* emerald-800 */
+  --color-severity-normal-border: #a7f3d0;
+  /* emerald-200 */
+
+  --color-severity-borderline-bg: #fffbeb;
+  /* amber-50  */
+  --color-severity-borderline-text: #92400e;
+  /* amber-800 */
+  --color-severity-borderline-border: #fde68a;
+  /* amber-200 */
+
+  --color-severity-abnormal-bg: #fff7ed;
+  /* orange-50  */
+  --color-severity-abnormal-text: #9a3412;
+  /* orange-800 */
+  --color-severity-abnormal-border: #fed7aa;
+  /* orange-200 */
+
+  --color-severity-critical-bg: #fef2f2;
+  /* red-50  */
+  --color-severity-critical-text: #991b1b;
+  /* red-800  */
+  --color-severity-critical-border: #fecaca;
+  /* red-200  */
+}
+
+/* ── Base styles ────────────────────────────────────────────────────────────── */
+
+@layer base {
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-family-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900;
+    min-height: 100dvh;
+  }
+
+  /* Smooth focus rings */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-teal-500;
+  }
+
+  /* Multilingual summary text — use generous leading for readability */
+  .summary-text {
+    @apply leading-relaxed;
+    font-family: var(--font-family-sans);
+  }
+}
+
+/* ── Component utilities ─────────────────────────────────────────────────── */
+
+@layer components {
+
+  /* Card */
+  .card {
+    @apply rounded-2xl bg-white shadow-sm border border-slate-100 p-6;
+  }
+
+  /* Section heading */
+  .section-heading {
+    @apply text-sm font-semibold uppercase tracking-wider text-slate-400;
+  }
+
+  /* Severity badge */
+  .severity-badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .severity-badge--normal {
+    background-color: var(--color-severity-normal-bg);
+    color: var(--color-severity-normal-text);
+  }
+
+  .severity-badge--borderline {
+    background-color: var(--color-severity-borderline-bg);
+    color: var(--color-severity-borderline-text);
+  }
+
+  .severity-badge--abnormal {
+    background-color: var(--color-severity-abnormal-bg);
+    color: var(--color-severity-abnormal-text);
+  }
+
+  .severity-badge--critical {
+    background-color: var(--color-severity-critical-bg);
+    color: var(--color-severity-critical-text);
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition hover:border-teal-300 hover:text-teal-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+}
+
+/* ── App mesh background ─────────────────────────────────────────────────── */
+/*
+ * Layered radial gradients create a soft, living background that shows through
+ * the glass cards. background-attachment:fixed keeps the gradient fixed to the
+ * viewport so it doesn't scroll with content.
+ */
+
+.app-mesh {
+  background-color: #f8fafc;
+  /* slate-50 base */
+  background-image:
+    radial-gradient(ellipse 60% 50% at 12% 8%, #d1fae5 0%, transparent 55%),
+    /* emerald-100 top-left */
+    radial-gradient(ellipse 55% 45% at 88% 4%, #ccfbf1 0%, transparent 55%),
+    /* teal-100 top-right */
+    radial-gradient(ellipse 50% 55% at 70% 60%, #ecfdf5 0%, transparent 60%),
+    /* emerald-50 center-right */
+    radial-gradient(ellipse 60% 50% at 8% 85%, #f0fdfa 0%, transparent 55%),
+    /* teal-50 bottom-left */
+    radial-gradient(ellipse 70% 40% at 50% 100%, #f1f5f9 0%, transparent 60%);
+  /* slate-100 bottom */
+  background-attachment: fixed;
+}
+
+/* ── Print styles ────────────────────────────────────────────────────────── */
+/*
+ * Flatten everything to white for print / Save as PDF.
+ * Remove backdrop-filter and translucent backgrounds so content is legible.
+ */
+
+@media print {
+  .app-mesh {
+    background: white !important;
+    background-image: none !important;
+    background-attachment: initial !important;
+  }
+
+  /* Strip backdrop-blur from any element that uses it */
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+}
